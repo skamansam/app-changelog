@@ -1,0 +1,34 @@
+<link rel="import" href="bower_components/polymer/polymer.html">
+
+<!--
+`app-changelog`
+Display a changelog from a markdown file
+
+@demo demo/index.html 
+-->
+
+<dom-module id="app-changelog">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'app-changelog',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'app-changelog',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
