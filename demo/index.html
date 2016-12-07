@@ -10,6 +10,7 @@
 
     <link rel="import" href="../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../bower_components/iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../bower_components/paper-button/paper-button.html">
     <link rel="import" href="../app-changelog.html">
 
     <style is="custom-style" include="demo-pages-shared-styles">
@@ -20,9 +21,43 @@
       <h3>Basic app-changelog demo</h3>
       <demo-snippet>
         <template>
-          <app-changelog></app-changelog>
+          <paper-button raised onclick='changelog1.show()'>Show Changelog</paper-button>
+          <app-changelog id="changelog1">
+            <div class='markdown-html'></div>
+            <script type="text/markdown" class='markdown'>
+              # Version 0.1
+              * Changed some stuff
+              * changed some more stuff
+              * got a basic demo working
+            </script>
+          </app-changelog>
         </template>
       </demo-snippet>
     </div>
+
+    <div class="vertical-section-container centered">
+      <h3>Loading From a URL</h3>
+      <demo-snippet>
+        <template>
+          <paper-button raised onclick='changelog2.show()'>Show Changelog</paper-button>
+          <app-changelog id="changelog2" src="./markdown-test.md">
+            <div class='markdown-html'></div>
+          </app-changelog>
+        </template>
+      </demo-snippet>
+    </div>
+
+    <div class="vertical-section-container centered">
+      <h3>Setting Elements' Text</h3>
+      <demo-snippet>
+        <template>
+          <paper-button raised onclick='changelog3.show()'>Show Changelog</paper-button>
+          <app-changelog id="changelog3" src="./markdown-test.md" heading="Changes since last version" button-text="Cool! Let's do this!">
+            <div class='markdown-html'></div>
+          </app-changelog>
+        </template>
+      </demo-snippet>
+    </div>
+
   </body>
 </html>

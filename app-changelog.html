@@ -1,10 +1,16 @@
+<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="bower_components/marked-element/marked-element.html">
+<link rel="import" href="bower_components/neon-animation/animations/scale-up-animation.html">
+<link rel="import" href="bower_components/neon-animation/animations/scale-down-animation.html">
 
 <!--
 `app-changelog`
-Display a changelog from a markdown file
+Display a changelog from a markdown file, wrapped in a paper-dialog. Most of the code was taken
+from `marked-element`, so it takes the same options. There are no dialog options yet, but they may be coming.
 
-@demo demo/index.html 
+@demo demo/index.html
 -->
 
 <dom-module id="app-changelog">
@@ -13,8 +19,33 @@ Display a changelog from a markdown file
       :host {
         display: block;
       }
+      #scroller {
+        padding: 30px
+      }
+      #versions{
+        list-style-type: none
+      }
+      /* Thanks IE 10. */
+      .hidden {
+        display: none !important;
+      }
     </style>
-    <h2>Hello [[prop1]]</h2>
+    <iron-ajax auto='[[src]]' handle-as='text' url='[[src]]' on-response='_handleAjaxResponse'></iron-ajax>
+    <paper-dialog id="dlg" always-on-top with-backdrop
+      entry-animation="scale-up-animation"
+      exit-animation="scale-down-animation"
+    >
+      <h2>[[heading]]</h2>
+      <div> <!-- div needed for spacing. -->
+        <paper-dialog-scrollable id="scroller" >
+          <content select=".markdown-html"></content>
+          <div id="content" class="hidden"></div>
+        </paper-dialog-scrollable>
+      </div>
+      <div class="buttons">
+        <paper-button dialog-dismiss>[[buttonText]]</paper-button>
+      </div>
+    </paper-dialog>
   </template>
 
   <script>
@@ -23,11 +54,194 @@ Display a changelog from a markdown file
       is: 'app-changelog',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'app-changelog',
+
+        /** The text to put on the OK/close button. */
+        buttonText: {
+          value: 'Got It!',
+          type: String
         },
+
+        /** The title of the dialog */
+        heading: { type: String, value: 'What\'s New'},
+
+        /** (not implemented) Show only versions up to this version.*/
+        //currentVersion: String,
+
+        /** (not implemented) Show only the version given in `current-version` */
+        //showOnlyVersion: Boolean,
+
+        /** The source file, if you want to use an external file. */
+        src: String,
+
+        /** The source doc to display, as a String. Supercedes `src` */
+        //doc: String,
+
+        /** Whether or not to show the dialog */
+        shown: {
+          type: Boolean,
+          notify: true,
+          default: false,
+          observer: 'show'
+        },
+
+        /**
+         * The markdown source that should be rendered by this element.
+         */
+        markdown: {
+          observer: 'render',
+          type: String,
+          value: null
+        },
+        /**
+         * Conform to obscure parts of markdown.pl as much as possible. Don't fix any of the original markdown bugs or poor behavior.
+         */
+        pedantic: {
+          observer: 'render',
+          type: Boolean,
+          value: false
+        },
+        /**
+         * Sanitize the output. Ignore any HTML that has been input.
+         */
+        sanitize: {
+          observer: 'render',
+          type: Boolean,
+          value: false
+        },
+        /**
+         * Use "smart" typographic punctuation for things like quotes and dashes.
+         */
+        smartypants: {
+          observer: 'render',
+          type: Boolean,
+          value: false
+        },
+        /**
+         * Callback function invoked by Marked after HTML has been rendered.
+         * It must take two arguments: err and text and must return the resulting text.
+         */
+        callback: {
+          observer: 'render',
+          type: Function,
+          value: null
+        }
       },
+
+      ready: function() {
+        if (!this.markdown) {
+          // Use the Markdown from the first `<script>` descendant whose MIME type starts with
+          // "text/markdown". Script elements beyond the first are ignored.
+          var markdownElement = Polymer.dom(this).querySelector('[type^="text/markdown"]');
+          if (markdownElement != null) {
+            this.markdown = this._unindent(markdownElement.textContent);
+          }
+        }
+      },
+
+      /** Show the dialog, and optionally set a new markdown text using the `new_val` parameter.*/
+      show: function(new_val){
+        let to_show = new_val || new_val == undefined
+        if(to_show) this.$.dlg.open()
+      },
+
+      /** Handles the response when the ajax call is loaded*/
+      _handleAjaxResponse: function(evt, iron_request){
+        console.log('AJAX: ',evt, iron_request)
+        this.markdown = iron_request.response
+        console.log(iron_request.resposne)
+        this.render()
+      },
+
+      /**
+       * Renders `markdown` to HTML when the element is attached.
+       *
+       * This serves a dual purpose:
+       *
+       *  * Prevents unnecessary work (no need to render when not visible).
+       *
+       *  * `attached` fires top-down, so we can give ancestors a chance to
+       *    register listeners for the `syntax-highlight` event _before_ we render
+       *    any markdown.
+       *
+       */
+      attached: function() {
+        this._attached = true;
+        this._outputElement = this.outputElement;
+        this.render();
+      },
+
+      detached: function() {
+        this._attached = false;
+      },
+
+      /**
+       * Unindents the markdown source that will be rendered.
+       */
+      unindent: function(text) {
+        return this._unindent(text);
+      },
+
+      get outputElement () {
+        var child = Polymer.dom(this).queryDistributedElements('.markdown-html')[0];
+
+        if (child)
+          return child;
+
+        this.toggleClass('hidden', false, this.$.content);
+        return this.$.content;
+      },
+
+      /**
+       * The `marked-render-complete` event is fired once Markdown to HTML
+       * conversion has finished, and the DOM has been populated via the resulting
+       * HTML.
+       *
+       * @event marked-render-complete
+       */
+
+      /**
+       * Renders `markdown` into this element's DOM.
+       *
+       * This is automatically called whenever the `markdown` property is changed.
+       *
+       * The only case where you should be calling this is if you are providing
+       * markdown via `<script type="text/markdown">` after this element has been
+       * constructed (or updating that markdown).
+       */
+      render: function() {
+        if (!this._attached) return;
+        if (!this.markdown) {
+          Polymer.dom(this._outputElement).innerHTML = '';
+          return;
+        }
+        var opts = {
+          highlight: this._highlight.bind(this),
+          sanitize: this.sanitize,
+          pedantic: this.pedantic,
+          smartypants: this.smartypants
+        };
+        Polymer.dom(this._outputElement).innerHTML = marked(this.markdown, opts, this.callback);
+        this.fire('marked-render-complete');
+      },
+
+      _highlight: function(code, lang) {
+        var event = this.fire('syntax-highlight', {code: code, lang: lang});
+        return event.detail.code || code;
+      },
+
+      _unindent: function(text) {
+        if (!text) return text;
+        var lines  = text.replace(/\t/g, '  ').split('\n');
+        var indent = lines.reduce(function(prev, line) {
+          if (/^\s*$/.test(line)) return prev;  // Completely ignore blank lines.
+
+          var lineIndent = line.match(/^(\s*)/)[0].length;
+          if (prev === null) return lineIndent;
+          return lineIndent < prev ? lineIndent : prev;
+        }, null);
+
+        return lines.map(function(l) { return l.substr(indent); }).join('\n');
+      }
 
     });
   </script>
