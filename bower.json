@@ -1,9 +1,10 @@
 {
   "name": "app-changelog",
+  "version": "0.1",
   "description": "Display a changelog from a markdown file",
   "main": "app-changelog.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0",
+    "polymer": "Polymer/polymer#^1.7.1",
     "paper-dialog": "^1.1.0",
     "neon-animation": "^1.2.4"
   },
