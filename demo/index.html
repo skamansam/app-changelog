@@ -23,7 +23,7 @@
         <template>
           <paper-button raised onclick='changelog1.show()'>Show Changelog</paper-button>
           <app-changelog id="changelog1">
-            <div class='markdown-html'></div>
+            <div slot='markdown-html'></div>
             <script type="text/markdown" class='markdown'>
               # Version 0.1
               * Changed some stuff
@@ -41,7 +41,7 @@
         <template>
           <paper-button raised onclick='changelog2.show()'>Show Changelog</paper-button>
           <app-changelog id="changelog2" src="./markdown-test.md">
-            <div class='markdown-html'></div>
+            <div slot='markdown-html'></div>
           </app-changelog>
         </template>
       </demo-snippet>
@@ -53,7 +53,7 @@
         <template>
           <paper-button raised onclick='changelog3.show()'>Show Changelog</paper-button>
           <app-changelog id="changelog3" src="./markdown-test.md" heading="Changes since last version" button-text="Cool! Let's do this!">
-            <div class='markdown-html'></div>
+            <div slot='markdown-html'></div>
           </app-changelog>
         </template>
       </demo-snippet>

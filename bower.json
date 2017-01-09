@@ -3,14 +3,15 @@
   "description": "Display a changelog from a markdown file",
   "main": "app-changelog.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^1.4.0",
-    "paper-dialog": "^1.1.0",
-    "neon-animation": "^1.2.4"
+    "polymer": "Polymer/polymer#2.0-preview",
+    "paper-dialog": "2.0-preview",
+    "neon-animation": "2.0-preview",
+    "marked-element": "2.0-preview"
   },
   "devDependencies": {
-    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
-    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0-preview",
     "web-component-tester": "^4.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+    "webcomponentsjs": "webcomponents/webcomponentsjs#v1"
   }
 }
