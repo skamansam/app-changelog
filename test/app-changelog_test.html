@@ -14,7 +14,15 @@
   <body>
     <test-fixture id="basic">
       <template>
-        <app-changelog></app-changelog>
+        <app-changelog id="changelog1">
+          <div class='markdown-html'></div>
+          <script type="text/markdown" class='markdown'>
+            # Version 0.1
+            * Changed some stuff
+            * changed some more stuff
+            * got a basic demo working
+          </script>
+        </app-changelog>
       </template>
     </test-fixture>
 
@@ -22,7 +30,16 @@
       suite('app-changelog', function() {
         test('instantiating the element works', function() {
           var element = fixture('basic');
-          assert.equal(element.is, 'app-changelog');
+          expect(element).to.be.a('app-changelog');
+        });
+        test('showing the dialog', function() {
+          var element = fixture('basic');
+          element.show();
+          setTimeout(function() {
+            expect(element.is(':visible')).to.be(true);
+            //chai.assert.equal($("#completed-task").is(":visible"), true);
+            done();
+          }, 300);
         });
       });
     </script>
