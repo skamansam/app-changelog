@@ -6,7 +6,8 @@
     "polymer": "Polymer/polymer#^2.0.0",
     "paper-dialog": "^2.0.0",
     "neon-animation": "^2.0.0",
-    "marked-element": "^2.0.0"
+    "marked-element": "^2.0.0",
+    "iron-ajax": "^2.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^2.0.0",
